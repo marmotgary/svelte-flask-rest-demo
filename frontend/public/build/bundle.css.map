@@ -1,0 +1,14 @@
+{
+  "version": 3,
+  "file": "bundle.css",
+  "sources": [
+    "..\\..\\src\\App.svelte",
+    "..\\..\\src\\Header.svelte"
+  ],
+  "sourcesContent": [
+    "<script>\n  import PackageList from './PackageList.svelte';\n  import Header from './Header.svelte';\n</script>\n\n<main>\n  <Header/>\n  <!--\t<p>Visit the <a href=\"https://svelte.dev/tutorial\">Svelte tutorial</a> to learn how to build Svelte apps.</p>-->\n  <PackageList/>\n</main>\n\n<style>\n  main {\n    text-align: center;\n    padding: 1em;\n    max-width: 240px;\n    margin: 0 auto;\n  }\n\n  @media (min-width: 640px) {\n    main {\n      max-width: none;\n    }\n  }\n</style>\n",
+    "<script>\r\n</script>\r\n\r\n<h1>Hello reaktor!</h1>\r\n\r\n<style>\r\n  h1 {\r\n    color: #ff3e00;\r\n    text-transform: uppercase;\r\n    font-size: 4em;\r\n    font-weight: 100;\r\n  }\r\n\r\n\r\n</style>\r\n"
+  ],
+  "names": [],
+  "mappings": "AAYE,IAAI,eAAC,CAAC,AACJ,UAAU,CAAE,MAAM,CAClB,OAAO,CAAE,GAAG,CACZ,SAAS,CAAE,KAAK,CAChB,MAAM,CAAE,CAAC,CAAC,IAAI,AAChB,CAAC,AAED,MAAM,AAAC,YAAY,KAAK,CAAC,AAAC,CAAC,AACzB,IAAI,eAAC,CAAC,AACJ,SAAS,CAAE,IAAI,AACjB,CAAC,AACH,CAAC;ACjBD,EAAE,cAAC,CAAC,AACF,KAAK,CAAE,OAAO,CACd,cAAc,CAAE,SAAS,CACzB,SAAS,CAAE,GAAG,CACd,WAAW,CAAE,GAAG,AAClB,CAAC"
+}

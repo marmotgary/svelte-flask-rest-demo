@@ -1,8 +1,9 @@
-from flask import Flask, jsonify, abort, request
+from flask import Flask, jsonify, abort, request, Response
+from flask_cors import CORS
 from utils import get_packages
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/')
 def hello_world():
@@ -37,4 +38,4 @@ def package_detail(id=None):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5001)
