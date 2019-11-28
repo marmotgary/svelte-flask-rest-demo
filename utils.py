@@ -6,9 +6,9 @@ def parse_desc_line(line):
 
     # Empty lines in field values are represented by " ."
     if line.strip() == ".":
-        return "\n"
+        return "<br /><br />"
     else:
-        return line
+        return line.replace("\n", "")
 
 
 def parse_depends_line(prefix, line):

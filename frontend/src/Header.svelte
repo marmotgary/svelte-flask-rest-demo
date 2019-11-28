@@ -1,7 +1,7 @@
 <script>
 </script>
 
-<h1>Hello reaktor!</h1>
+<h1><a href="/#">Hello reaktor!</a></h1>
 
 <style>
   h1 {
@@ -9,6 +9,10 @@
     text-transform: uppercase;
     font-size: 4em;
     font-weight: 100;
+    text-align: center;
+  }
+  h1 a {
+    color: unset;
   }
 
 

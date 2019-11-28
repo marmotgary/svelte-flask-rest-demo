@@ -1,5 +1,10 @@
 <script>
+  import {link} from 'svelte-spa-router'
+  // import Package from './Package.svelte';
   import { onMount } from 'svelte';
+  // const routes = {
+  //   '/package/*': Package,
+  // }
   // Put packages into store?
   let packages = [];
   onMount(async () => {
@@ -7,11 +12,11 @@
     packages = await res.json();
   });
 </script>
-
-{#each packages as pkg (pkg.id)}
-  <li><a href="package/{pkg.id}">
+<!--<Router {routes}/>-->
+{#each packages as pkg}
+  <li><a href="/package/{pkg.id}" use:link>
       {pkg.name}
   </a></li>
 {:else}
-  <p>Loading...</p>
+  <p>...</p>
 {/each}
