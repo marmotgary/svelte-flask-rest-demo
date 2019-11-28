@@ -13,10 +13,21 @@
   });
 </script>
 <!--<Router {routes}/>-->
-{#each packages as pkg}
-  <li><a href="/package/{pkg.id}" use:link>
-      {pkg.name}
-  </a></li>
-{:else}
-  <p>...</p>
-{/each}
+<div id="packageContainer">
+  {#each packages as pkg}
+    <li>
+      <a href="/package/{pkg.id}" use:link>
+        {pkg.name}
+      </a>
+    </li>
+  {:else}
+    <p>...</p>
+  {/each}
+</div>
+
+<style>
+  li {
+    list-style-type: none;
+  }
+
+</style>

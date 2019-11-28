@@ -64,10 +64,6 @@ var app = (function () {
     function empty() {
         return text('');
     }
-    function listen(node, event, handler, options) {
-        node.addEventListener(event, handler, options);
-        return () => node.removeEventListener(event, handler, options);
-    }
     function attr(node, attribute, value) {
         if (value == null)
             node.removeAttribute(attribute);
@@ -359,19 +355,6 @@ var app = (function () {
     function detach_dev(node) {
         dispatch_dev("SvelteDOMRemove", { node });
         detach(node);
-    }
-    function listen_dev(node, event, handler, options, has_prevent_default, has_stop_propagation) {
-        const modifiers = options === true ? ["capture"] : options ? Array.from(Object.keys(options)) : [];
-        if (has_prevent_default)
-            modifiers.push('preventDefault');
-        if (has_stop_propagation)
-            modifiers.push('stopPropagation');
-        dispatch_dev("SvelteDOMAddEventListener", { node, event, handler, modifiers });
-        const dispose = listen(node, event, handler, options);
-        return () => {
-            dispatch_dev("SvelteDOMRemoveEventListener", { node, event, handler, modifiers });
-            dispose();
-        };
     }
     function attr_dev(node, attribute, value) {
         attr(node, attribute, value);
@@ -872,7 +855,7 @@ var app = (function () {
     	return child_ctx;
     }
 
-    // (20:0) {:else}
+    // (23:2) {:else}
     function create_else_block(ctx) {
     	let p;
 
@@ -880,7 +863,7 @@ var app = (function () {
     		c: function create() {
     			p = element("p");
     			p.textContent = "...";
-    			add_location(p, file, 20, 2, 537);
+    			add_location(p, file, 23, 4, 594);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, p, anchor);
@@ -894,22 +877,22 @@ var app = (function () {
     		block,
     		id: create_else_block.name,
     		type: "else",
-    		source: "(20:0) {:else}",
+    		source: "(23:2) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (16:0) {#each packages as pkg}
+    // (17:2) {#each packages as pkg}
     function create_each_block(ctx) {
     	let li;
     	let a;
     	let t0_value = ctx.pkg.name + "";
     	let t0;
-    	let t1;
     	let a_href_value;
     	let link_action;
+    	let t1;
 
     	const block = {
     		c: function create() {
@@ -918,15 +901,16 @@ var app = (function () {
     			t0 = text(t0_value);
     			t1 = space();
     			attr_dev(a, "href", a_href_value = "/package/" + ctx.pkg.id);
-    			add_location(a, file, 16, 6, 456);
-    			add_location(li, file, 16, 2, 452);
+    			add_location(a, file, 18, 6, 497);
+    			attr_dev(li, "class", "svelte-1icx3p7");
+    			add_location(li, file, 17, 4, 485);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, li, anchor);
     			append_dev(li, a);
     			append_dev(a, t0);
-    			append_dev(a, t1);
     			link_action = link.call(null, a) || ({});
+    			append_dev(li, t1);
     		},
     		p: function update(changed, ctx) {
     			if (changed.packages && t0_value !== (t0_value = ctx.pkg.name + "")) set_data_dev(t0, t0_value);
@@ -945,7 +929,7 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(16:0) {#each packages as pkg}",
+    		source: "(17:2) {#each packages as pkg}",
     		ctx
     	});
 
@@ -953,7 +937,7 @@ var app = (function () {
     }
 
     function create_fragment$1(ctx) {
-    	let each_1_anchor;
+    	let div;
     	let each_value = ctx.packages;
     	let each_blocks = [];
 
@@ -970,24 +954,27 @@ var app = (function () {
 
     	const block = {
     		c: function create() {
+    			div = element("div");
+
     			for (let i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].c();
     			}
 
-    			each_1_anchor = empty();
+    			attr_dev(div, "id", "packageContainer");
+    			add_location(div, file, 15, 0, 425);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
+    			insert_dev(target, div, anchor);
+
     			for (let i = 0; i < each_blocks.length; i += 1) {
-    				each_blocks[i].m(target, anchor);
+    				each_blocks[i].m(div, null);
     			}
 
-    			insert_dev(target, each_1_anchor, anchor);
-
     			if (each_1_else) {
-    				each_1_else.m(target, anchor);
+    				each_1_else.m(div, null);
     			}
     		},
     		p: function update(changed, ctx) {
@@ -1003,7 +990,7 @@ var app = (function () {
     					} else {
     						each_blocks[i] = create_each_block(child_ctx);
     						each_blocks[i].c();
-    						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
+    						each_blocks[i].m(div, null);
     					}
     				}
 
@@ -1022,15 +1009,15 @@ var app = (function () {
     			} else if (!each_1_else) {
     				each_1_else = create_else_block(ctx);
     				each_1_else.c();
-    				each_1_else.m(each_1_anchor.parentNode, each_1_anchor);
+    				each_1_else.m(div, null);
     			}
     		},
     		i: noop,
     		o: noop,
     		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div);
     			destroy_each(each_blocks, detaching);
-    			if (detaching) detach_dev(each_1_anchor);
-    			if (each_1_else) each_1_else.d(detaching);
+    			if (each_1_else) each_1_else.d();
     		}
     	};
 
@@ -1078,10 +1065,9 @@ var app = (function () {
     	}
     }
 
-    /* src\Package.svelte generated by Svelte v3.15.0 */
+    /* src\DepenencyList.svelte generated by Svelte v3.15.0 */
 
-    const { console: console_1 } = globals;
-    const file$1 = "src\\Package.svelte";
+    const file$1 = "src\\DepenencyList.svelte";
 
     function get_each_context$1(ctx, list, i) {
     	const child_ctx = Object.create(ctx);
@@ -1089,47 +1075,10 @@ var app = (function () {
     	return child_ctx;
     }
 
-    function get_each_context_1(ctx, list, i) {
-    	const child_ctx = Object.create(ctx);
-    	child_ctx.pkg = list[i];
-    	return child_ctx;
-    }
-
-    // (17:0) {#if pkg}
+    // (5:0) {#if packageList != null}
     function create_if_block(ctx) {
-    	let p0;
-    	let span0;
-    	let t1;
-    	let t2_value = ctx.pkg.name + "";
-    	let t2;
-    	let t3;
-    	let p1;
-    	let span1;
-    	let t5;
-    	let t6_value = ctx.pkg.description_short + "";
-    	let t6;
-    	let t7;
-    	let p2;
-    	let span2;
-    	let t9;
-    	let html_tag;
-    	let raw_value = ctx.pkg.description + "";
-    	let t10;
-    	let p3;
-    	let span3;
-    	let t12;
-    	let t13;
-    	let p4;
-    	let span4;
-    	let t15;
-    	let each_value_1 = ctx.pkg.depends;
-    	let each_blocks_1 = [];
-
-    	for (let i = 0; i < each_value_1.length; i += 1) {
-    		each_blocks_1[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
-    	}
-
-    	let each_value = ctx.pkg.depends_this;
+    	let each_1_anchor;
+    	let each_value = ctx.packageList;
     	let each_blocks = [];
 
     	for (let i = 0; i < each_value.length; i += 1) {
@@ -1138,122 +1087,22 @@ var app = (function () {
 
     	const block = {
     		c: function create() {
-    			p0 = element("p");
-    			span0 = element("span");
-    			span0.textContent = "Name:";
-    			t1 = space();
-    			t2 = text(t2_value);
-    			t3 = space();
-    			p1 = element("p");
-    			span1 = element("span");
-    			span1.textContent = "Description short:";
-    			t5 = space();
-    			t6 = text(t6_value);
-    			t7 = space();
-    			p2 = element("p");
-    			span2 = element("span");
-    			span2.textContent = "Description:";
-    			t9 = space();
-    			t10 = space();
-    			p3 = element("p");
-    			span3 = element("span");
-    			span3.textContent = "This depends on:";
-    			t12 = space();
-
-    			for (let i = 0; i < each_blocks_1.length; i += 1) {
-    				each_blocks_1[i].c();
-    			}
-
-    			t13 = space();
-    			p4 = element("p");
-    			span4 = element("span");
-    			span4.textContent = "Depends on this:";
-    			t15 = space();
-
     			for (let i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].c();
     			}
 
-    			attr_dev(span0, "class", "svelte-yi4my6");
-    			add_location(span0, file$1, 17, 7, 430);
-    			add_location(p0, file$1, 17, 4, 427);
-    			attr_dev(span1, "class", "svelte-yi4my6");
-    			add_location(span1, file$1, 18, 7, 472);
-    			add_location(p1, file$1, 18, 4, 469);
-    			attr_dev(span2, "class", "svelte-yi4my6");
-    			add_location(span2, file$1, 19, 7, 540);
-    			html_tag = new HtmlTag(raw_value, null);
-    			add_location(p2, file$1, 19, 4, 537);
-    			attr_dev(span3, "class", "svelte-yi4my6");
-    			add_location(span3, file$1, 20, 7, 602);
-    			add_location(p3, file$1, 20, 4, 599);
-    			attr_dev(span4, "class", "svelte-yi4my6");
-    			add_location(span4, file$1, 31, 7, 1018);
-    			add_location(p4, file$1, 31, 4, 1015);
+    			each_1_anchor = empty();
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, p0, anchor);
-    			append_dev(p0, span0);
-    			append_dev(p0, t1);
-    			append_dev(p0, t2);
-    			insert_dev(target, t3, anchor);
-    			insert_dev(target, p1, anchor);
-    			append_dev(p1, span1);
-    			append_dev(p1, t5);
-    			append_dev(p1, t6);
-    			insert_dev(target, t7, anchor);
-    			insert_dev(target, p2, anchor);
-    			append_dev(p2, span2);
-    			append_dev(p2, t9);
-    			html_tag.m(p2);
-    			insert_dev(target, t10, anchor);
-    			insert_dev(target, p3, anchor);
-    			append_dev(p3, span3);
-    			append_dev(p3, t12);
-
-    			for (let i = 0; i < each_blocks_1.length; i += 1) {
-    				each_blocks_1[i].m(p3, null);
-    			}
-
-    			insert_dev(target, t13, anchor);
-    			insert_dev(target, p4, anchor);
-    			append_dev(p4, span4);
-    			append_dev(p4, t15);
-
     			for (let i = 0; i < each_blocks.length; i += 1) {
-    				each_blocks[i].m(p4, null);
+    				each_blocks[i].m(target, anchor);
     			}
+
+    			insert_dev(target, each_1_anchor, anchor);
     		},
     		p: function update(changed, ctx) {
-    			if (changed.pkg && t2_value !== (t2_value = ctx.pkg.name + "")) set_data_dev(t2, t2_value);
-    			if (changed.pkg && t6_value !== (t6_value = ctx.pkg.description_short + "")) set_data_dev(t6, t6_value);
-    			if (changed.pkg && raw_value !== (raw_value = ctx.pkg.description + "")) html_tag.p(raw_value);
-
-    			if (changed.pkg || changed.getPackage) {
-    				each_value_1 = ctx.pkg.depends;
-    				let i;
-
-    				for (i = 0; i < each_value_1.length; i += 1) {
-    					const child_ctx = get_each_context_1(ctx, each_value_1, i);
-
-    					if (each_blocks_1[i]) {
-    						each_blocks_1[i].p(changed, child_ctx);
-    					} else {
-    						each_blocks_1[i] = create_each_block_1(child_ctx);
-    						each_blocks_1[i].c();
-    						each_blocks_1[i].m(p3, null);
-    					}
-    				}
-
-    				for (; i < each_blocks_1.length; i += 1) {
-    					each_blocks_1[i].d(1);
-    				}
-
-    				each_blocks_1.length = each_value_1.length;
-    			}
-
-    			if (changed.pkg || changed.getPackage) {
-    				each_value = ctx.pkg.depends_this;
+    			if (changed.packageList) {
+    				each_value = ctx.packageList;
     				let i;
 
     				for (i = 0; i < each_value.length; i += 1) {
@@ -1264,7 +1113,7 @@ var app = (function () {
     					} else {
     						each_blocks[i] = create_each_block$1(child_ctx);
     						each_blocks[i].c();
-    						each_blocks[i].m(p4, null);
+    						each_blocks[i].m(each_1_anchor.parentNode, each_1_anchor);
     					}
     				}
 
@@ -1276,17 +1125,8 @@ var app = (function () {
     			}
     		},
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(p0);
-    			if (detaching) detach_dev(t3);
-    			if (detaching) detach_dev(p1);
-    			if (detaching) detach_dev(t7);
-    			if (detaching) detach_dev(p2);
-    			if (detaching) detach_dev(t10);
-    			if (detaching) detach_dev(p3);
-    			destroy_each(each_blocks_1, detaching);
-    			if (detaching) detach_dev(t13);
-    			if (detaching) detach_dev(p4);
     			destroy_each(each_blocks, detaching);
+    			if (detaching) detach_dev(each_1_anchor);
     		}
     	};
 
@@ -1294,15 +1134,15 @@ var app = (function () {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(17:0) {#if pkg}",
+    		source: "(5:0) {#if packageList != null}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (26:12) {:else}
-    function create_else_block_1(ctx) {
+    // (10:8) {:else}
+    function create_else_block$1(ctx) {
     	let span;
     	let t_value = ctx.pkg.name + "";
     	let t;
@@ -1313,15 +1153,15 @@ var app = (function () {
     			t = text(t_value);
     			set_style(span, "color", "black");
     			set_style(span, "font-weight", "400");
-    			attr_dev(span, "class", "svelte-yi4my6");
-    			add_location(span, file$1, 26, 16, 883);
+    			attr_dev(span, "class", "svelte-xdc7db");
+    			add_location(span, file$1, 10, 12, 278);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
     			append_dev(span, t);
     		},
     		p: function update(changed, ctx) {
-    			if (changed.pkg && t_value !== (t_value = ctx.pkg.name + "")) set_data_dev(t, t_value);
+    			if (changed.packageList && t_value !== (t_value = ctx.pkg.name + "")) set_data_dev(t, t_value);
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(span);
@@ -1330,71 +1170,65 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block_1.name,
+    		id: create_else_block$1.name,
     		type: "else",
-    		source: "(26:12) {:else}",
+    		source: "(10:8) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (24:10) {#if pkg.id != null}
-    function create_if_block_2(ctx) {
+    // (8:6) {#if pkg.id != null}
+    function create_if_block_1(ctx) {
     	let a;
     	let t_value = ctx.pkg.name + "";
     	let t;
     	let a_href_value;
-    	let link_action;
-    	let dispose;
 
     	const block = {
     		c: function create() {
     			a = element("a");
     			t = text(t_value);
-    			attr_dev(a, "class", "dependList svelte-yi4my6");
-    			attr_dev(a, "href", a_href_value = "/package/" + ctx.pkg.id);
-    			add_location(a, file$1, 24, 16, 752);
-    			dispose = listen_dev(a, "click", getPackage, false, false, false);
+    			attr_dev(a, "class", "dependList svelte-xdc7db");
+    			attr_dev(a, "href", a_href_value = "#/package/" + ctx.pkg.id);
+    			add_location(a, file$1, 8, 12, 185);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, a, anchor);
     			append_dev(a, t);
-    			link_action = link.call(null, a) || ({});
     		},
     		p: function update(changed, ctx) {
-    			if (changed.pkg && t_value !== (t_value = ctx.pkg.name + "")) set_data_dev(t, t_value);
+    			if (changed.packageList && t_value !== (t_value = ctx.pkg.name + "")) set_data_dev(t, t_value);
 
-    			if (changed.pkg && a_href_value !== (a_href_value = "/package/" + ctx.pkg.id)) {
+    			if (changed.packageList && a_href_value !== (a_href_value = "#/package/" + ctx.pkg.id)) {
     				attr_dev(a, "href", a_href_value);
     			}
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(a);
-    			if (link_action && is_function(link_action.destroy)) link_action.destroy();
-    			dispose();
     		}
     	};
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_2.name,
+    		id: create_if_block_1.name,
     		type: "if",
-    		source: "(24:10) {#if pkg.id != null}",
+    		source: "(8:6) {#if pkg.id != null}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (22:8) {#each pkg.depends as pkg}
-    function create_each_block_1(ctx) {
+    // (6:0) {#each packageList as pkg}
+    function create_each_block$1(ctx) {
     	let span;
     	let t;
 
     	function select_block_type(changed, ctx) {
-    		if (ctx.pkg.id != null) return create_if_block_2;
-    		return create_else_block_1;
+    		if (ctx.pkg.id != null) return create_if_block_1;
+    		return create_else_block$1;
     	}
 
     	let current_block_type = select_block_type(null, ctx);
@@ -1405,8 +1239,8 @@ var app = (function () {
     			span = element("span");
     			if_block.c();
     			t = space();
-    			attr_dev(span, "class", "dependList svelte-yi4my6");
-    			add_location(span, file$1, 22, 8, 677);
+    			attr_dev(span, "class", "dependList svelte-xdc7db");
+    			add_location(span, file$1, 6, 4, 118);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -1434,151 +1268,9 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_each_block_1.name,
-    		type: "each",
-    		source: "(22:8) {#each pkg.depends as pkg}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (37:12) {:else}
-    function create_else_block$1(ctx) {
-    	let span;
-    	let t_value = ctx.pkg.name + "";
-    	let t;
-
-    	const block = {
-    		c: function create() {
-    			span = element("span");
-    			t = text(t_value);
-    			set_style(span, "color", "black");
-    			set_style(span, "font-weight", "400");
-    			attr_dev(span, "class", "svelte-yi4my6");
-    			add_location(span, file$1, 37, 16, 1304);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-    			append_dev(span, t);
-    		},
-    		p: function update(changed, ctx) {
-    			if (changed.pkg && t_value !== (t_value = ctx.pkg.name + "")) set_data_dev(t, t_value);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_else_block$1.name,
-    		type: "else",
-    		source: "(37:12) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (35:10) {#if pkg.id != null}
-    function create_if_block_1(ctx) {
-    	let a;
-    	let t_value = ctx.pkg.name + "";
-    	let t;
-    	let a_href_value;
-    	let link_action;
-    	let dispose;
-
-    	const block = {
-    		c: function create() {
-    			a = element("a");
-    			t = text(t_value);
-    			attr_dev(a, "class", "dependList svelte-yi4my6");
-    			attr_dev(a, "href", a_href_value = "/package/" + ctx.pkg.id);
-    			add_location(a, file$1, 35, 16, 1173);
-    			dispose = listen_dev(a, "click", getPackage, false, false, false);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, a, anchor);
-    			append_dev(a, t);
-    			link_action = link.call(null, a) || ({});
-    		},
-    		p: function update(changed, ctx) {
-    			if (changed.pkg && t_value !== (t_value = ctx.pkg.name + "")) set_data_dev(t, t_value);
-
-    			if (changed.pkg && a_href_value !== (a_href_value = "/package/" + ctx.pkg.id)) {
-    				attr_dev(a, "href", a_href_value);
-    			}
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(a);
-    			if (link_action && is_function(link_action.destroy)) link_action.destroy();
-    			dispose();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_1.name,
-    		type: "if",
-    		source: "(35:10) {#if pkg.id != null}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (33:8) {#each pkg.depends_this as pkg}
-    function create_each_block$1(ctx) {
-    	let span;
-    	let t;
-
-    	function select_block_type_1(changed, ctx) {
-    		if (ctx.pkg.id != null) return create_if_block_1;
-    		return create_else_block$1;
-    	}
-
-    	let current_block_type = select_block_type_1(null, ctx);
-    	let if_block = current_block_type(ctx);
-
-    	const block = {
-    		c: function create() {
-    			span = element("span");
-    			if_block.c();
-    			t = space();
-    			attr_dev(span, "class", "dependList svelte-yi4my6");
-    			add_location(span, file$1, 33, 8, 1098);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, span, anchor);
-    			if_block.m(span, null);
-    			append_dev(span, t);
-    		},
-    		p: function update(changed, ctx) {
-    			if (current_block_type === (current_block_type = select_block_type_1(changed, ctx)) && if_block) {
-    				if_block.p(changed, ctx);
-    			} else {
-    				if_block.d(1);
-    				if_block = current_block_type(ctx);
-
-    				if (if_block) {
-    					if_block.c();
-    					if_block.m(span, t);
-    				}
-    			}
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(span);
-    			if_block.d();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
     		id: create_each_block$1.name,
     		type: "each",
-    		source: "(33:8) {#each pkg.depends_this as pkg}",
+    		source: "(6:0) {#each packageList as pkg}",
     		ctx
     	});
 
@@ -1587,7 +1279,7 @@ var app = (function () {
 
     function create_fragment$2(ctx) {
     	let if_block_anchor;
-    	let if_block = ctx.pkg && create_if_block(ctx);
+    	let if_block = ctx.packageList != null && create_if_block(ctx);
 
     	const block = {
     		c: function create() {
@@ -1602,7 +1294,7 @@ var app = (function () {
     			insert_dev(target, if_block_anchor, anchor);
     		},
     		p: function update(changed, ctx) {
-    			if (ctx.pkg) {
+    			if (ctx.packageList != null) {
     				if (if_block) {
     					if_block.p(changed, ctx);
     				} else {
@@ -1634,19 +1326,290 @@ var app = (function () {
     	return block;
     }
 
-    function getPackage(event) {
-    	console.log(event);
+    function instance$2($$self, $$props, $$invalidate) {
+    	let { packageList = null } = $$props;
+    	const writable_props = ["packageList"];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<DepenencyList> was created with unknown prop '${key}'`);
+    	});
+
+    	$$self.$set = $$props => {
+    		if ("packageList" in $$props) $$invalidate("packageList", packageList = $$props.packageList);
+    	};
+
+    	$$self.$capture_state = () => {
+    		return { packageList };
+    	};
+
+    	$$self.$inject_state = $$props => {
+    		if ("packageList" in $$props) $$invalidate("packageList", packageList = $$props.packageList);
+    	};
+
+    	return { packageList };
     }
 
-    function instance$2($$self, $$props, $$invalidate) {
-    	let { params = {} } = $$props;
-    	let pkg;
-    	let url = "http://localhost:5001/api/v1/package/" + params.wild;
+    class DepenencyList extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+    		init(this, options, instance$2, create_fragment$2, safe_not_equal, { packageList: 0 });
 
-    	onMount(async () => {
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "DepenencyList",
+    			options,
+    			id: create_fragment$2.name
+    		});
+    	}
+
+    	get packageList() {
+    		throw new Error("<DepenencyList>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set packageList(value) {
+    		throw new Error("<DepenencyList>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    /* src\Package.svelte generated by Svelte v3.15.0 */
+
+    const { console: console_1 } = globals;
+    const file$2 = "src\\Package.svelte";
+
+    // (19:0) {#if pkg}
+    function create_if_block$1(ctx) {
+    	let p0;
+    	let span0;
+    	let t1;
+    	let t2_value = ctx.pkg.name + "";
+    	let t2;
+    	let t3;
+    	let p1;
+    	let span1;
+    	let t5;
+    	let t6_value = ctx.pkg.description_short + "";
+    	let t6;
+    	let t7;
+    	let p2;
+    	let span2;
+    	let t9;
+    	let html_tag;
+    	let raw_value = ctx.pkg.description + "";
+    	let t10;
+    	let p3;
+    	let span3;
+    	let t12;
+    	let t13;
+    	let p4;
+    	let span4;
+    	let t15;
+    	let current;
+
+    	const depenencylist0 = new DepenencyList({
+    			props: { packageList: ctx.pkg.depends },
+    			$$inline: true
+    		});
+
+    	const depenencylist1 = new DepenencyList({
+    			props: { packageList: ctx.pkg.depends_this },
+    			$$inline: true
+    		});
+
+    	const block = {
+    		c: function create() {
+    			p0 = element("p");
+    			span0 = element("span");
+    			span0.textContent = "Name:";
+    			t1 = space();
+    			t2 = text(t2_value);
+    			t3 = space();
+    			p1 = element("p");
+    			span1 = element("span");
+    			span1.textContent = "Description short:";
+    			t5 = space();
+    			t6 = text(t6_value);
+    			t7 = space();
+    			p2 = element("p");
+    			span2 = element("span");
+    			span2.textContent = "Description:";
+    			t9 = space();
+    			t10 = space();
+    			p3 = element("p");
+    			span3 = element("span");
+    			span3.textContent = "This depends on:";
+    			t12 = space();
+    			create_component(depenencylist0.$$.fragment);
+    			t13 = space();
+    			p4 = element("p");
+    			span4 = element("span");
+    			span4.textContent = "Depends on this:";
+    			t15 = space();
+    			create_component(depenencylist1.$$.fragment);
+    			attr_dev(span0, "class", "svelte-1i8c60n");
+    			add_location(span0, file$2, 19, 7, 423);
+    			add_location(p0, file$2, 19, 4, 420);
+    			attr_dev(span1, "class", "svelte-1i8c60n");
+    			add_location(span1, file$2, 20, 7, 465);
+    			add_location(p1, file$2, 20, 4, 462);
+    			attr_dev(span2, "class", "svelte-1i8c60n");
+    			add_location(span2, file$2, 21, 7, 533);
+    			html_tag = new HtmlTag(raw_value, null);
+    			add_location(p2, file$2, 21, 4, 530);
+    			attr_dev(span3, "class", "svelte-1i8c60n");
+    			add_location(span3, file$2, 22, 7, 595);
+    			add_location(p3, file$2, 22, 4, 592);
+    			attr_dev(span4, "class", "svelte-1i8c60n");
+    			add_location(span4, file$2, 25, 7, 695);
+    			add_location(p4, file$2, 25, 4, 692);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, p0, anchor);
+    			append_dev(p0, span0);
+    			append_dev(p0, t1);
+    			append_dev(p0, t2);
+    			insert_dev(target, t3, anchor);
+    			insert_dev(target, p1, anchor);
+    			append_dev(p1, span1);
+    			append_dev(p1, t5);
+    			append_dev(p1, t6);
+    			insert_dev(target, t7, anchor);
+    			insert_dev(target, p2, anchor);
+    			append_dev(p2, span2);
+    			append_dev(p2, t9);
+    			html_tag.m(p2);
+    			insert_dev(target, t10, anchor);
+    			insert_dev(target, p3, anchor);
+    			append_dev(p3, span3);
+    			append_dev(p3, t12);
+    			mount_component(depenencylist0, p3, null);
+    			insert_dev(target, t13, anchor);
+    			insert_dev(target, p4, anchor);
+    			append_dev(p4, span4);
+    			append_dev(p4, t15);
+    			mount_component(depenencylist1, p4, null);
+    			current = true;
+    		},
+    		p: function update(changed, ctx) {
+    			if ((!current || changed.pkg) && t2_value !== (t2_value = ctx.pkg.name + "")) set_data_dev(t2, t2_value);
+    			if ((!current || changed.pkg) && t6_value !== (t6_value = ctx.pkg.description_short + "")) set_data_dev(t6, t6_value);
+    			if ((!current || changed.pkg) && raw_value !== (raw_value = ctx.pkg.description + "")) html_tag.p(raw_value);
+    			const depenencylist0_changes = {};
+    			if (changed.pkg) depenencylist0_changes.packageList = ctx.pkg.depends;
+    			depenencylist0.$set(depenencylist0_changes);
+    			const depenencylist1_changes = {};
+    			if (changed.pkg) depenencylist1_changes.packageList = ctx.pkg.depends_this;
+    			depenencylist1.$set(depenencylist1_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(depenencylist0.$$.fragment, local);
+    			transition_in(depenencylist1.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(depenencylist0.$$.fragment, local);
+    			transition_out(depenencylist1.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(p0);
+    			if (detaching) detach_dev(t3);
+    			if (detaching) detach_dev(p1);
+    			if (detaching) detach_dev(t7);
+    			if (detaching) detach_dev(p2);
+    			if (detaching) detach_dev(t10);
+    			if (detaching) detach_dev(p3);
+    			destroy_component(depenencylist0);
+    			if (detaching) detach_dev(t13);
+    			if (detaching) detach_dev(p4);
+    			destroy_component(depenencylist1);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block$1.name,
+    		type: "if",
+    		source: "(19:0) {#if pkg}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function create_fragment$3(ctx) {
+    	let if_block_anchor;
+    	let current;
+    	let if_block = ctx.pkg && create_if_block$1(ctx);
+
+    	const block = {
+    		c: function create() {
+    			if (if_block) if_block.c();
+    			if_block_anchor = empty();
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			if (if_block) if_block.m(target, anchor);
+    			insert_dev(target, if_block_anchor, anchor);
+    			current = true;
+    		},
+    		p: function update(changed, ctx) {
+    			if (ctx.pkg) {
+    				if (if_block) {
+    					if_block.p(changed, ctx);
+    					transition_in(if_block, 1);
+    				} else {
+    					if_block = create_if_block$1(ctx);
+    					if_block.c();
+    					transition_in(if_block, 1);
+    					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+    				}
+    			} else if (if_block) {
+    				group_outros();
+
+    				transition_out(if_block, 1, 1, () => {
+    					if_block = null;
+    				});
+
+    				check_outros();
+    			}
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(if_block);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(if_block);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if (if_block) if_block.d(detaching);
+    			if (detaching) detach_dev(if_block_anchor);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$3.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$3($$self, $$props, $$invalidate) {
+    	let { params } = $$props;
+    	let pkg, url;
+
+    	async function getPackages(url) {
     		const res = await fetch(url);
     		$$invalidate("pkg", pkg = await res.json());
-    	});
+    	}
 
     	const writable_props = ["params"];
 
@@ -1665,7 +1628,17 @@ var app = (function () {
     	$$self.$inject_state = $$props => {
     		if ("params" in $$props) $$invalidate("params", params = $$props.params);
     		if ("pkg" in $$props) $$invalidate("pkg", pkg = $$props.pkg);
-    		if ("url" in $$props) url = $$props.url;
+    		if ("url" in $$props) $$invalidate("url", url = $$props.url);
+    	};
+
+    	$$self.$$.update = (changed = { params: 1 }) => {
+    		if (changed.params) {
+    			 {
+    				let url = "http://localhost:5001/api/v1/package/" + params.id;
+    				console.log(url);
+    				getPackages(url);
+    			}
+    		}
     	};
 
     	return { params, pkg };
@@ -1674,14 +1647,21 @@ var app = (function () {
     class Package extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$2, create_fragment$2, safe_not_equal, { params: 0 });
+    		init(this, options, instance$3, create_fragment$3, safe_not_equal, { params: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Package",
     			options,
-    			id: create_fragment$2.name
+    			id: create_fragment$3.name
     		});
+
+    		const { ctx } = this.$$;
+    		const props = options.props || ({});
+
+    		if (ctx.params === undefined && !("params" in props)) {
+    			console_1.warn("<Package> was created without expected prop 'params'");
+    		}
     	}
 
     	get params() {
@@ -1695,9 +1675,9 @@ var app = (function () {
 
     /* src\Header.svelte generated by Svelte v3.15.0 */
 
-    const file$2 = "src\\Header.svelte";
+    const file$3 = "src\\Header.svelte";
 
-    function create_fragment$3(ctx) {
+    function create_fragment$4(ctx) {
     	let h1;
     	let a;
 
@@ -1708,9 +1688,9 @@ var app = (function () {
     			a.textContent = "Hello reaktor!";
     			attr_dev(a, "href", "/#");
     			attr_dev(a, "class", "svelte-penf27");
-    			add_location(a, file$2, 3, 4, 27);
+    			add_location(a, file$3, 3, 4, 27);
     			attr_dev(h1, "class", "svelte-penf27");
-    			add_location(h1, file$2, 3, 0, 23);
+    			add_location(h1, file$3, 3, 0, 23);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1729,7 +1709,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$3.name,
+    		id: create_fragment$4.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1741,21 +1721,21 @@ var app = (function () {
     class Header extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, null, create_fragment$3, safe_not_equal, {});
+    		init(this, options, null, create_fragment$4, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Header",
     			options,
-    			id: create_fragment$3.name
+    			id: create_fragment$4.name
     		});
     	}
     }
 
     /* src\App.svelte generated by Svelte v3.15.0 */
-    const file$3 = "src\\App.svelte";
+    const file$4 = "src\\App.svelte";
 
-    function create_fragment$4(ctx) {
+    function create_fragment$5(ctx) {
     	let main;
     	let t;
     	let current;
@@ -1773,7 +1753,7 @@ var app = (function () {
     			t = space();
     			create_component(router.$$.fragment);
     			attr_dev(main, "class", "svelte-s3ue24");
-    			add_location(main, file$3, 11, 0, 273);
+    			add_location(main, file$4, 11, 0, 275);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1806,7 +1786,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$4.name,
+    		id: create_fragment$5.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1815,8 +1795,11 @@ var app = (function () {
     	return block;
     }
 
-    function instance$3($$self) {
-    	const routes = { "/": PackageList, "/package/*": Package };
+    function instance$4($$self) {
+    	const routes = {
+    		"/": PackageList,
+    		"/package/:id": Package
+    	};
 
     	$$self.$capture_state = () => {
     		return {};
@@ -1832,13 +1815,13 @@ var app = (function () {
     class App extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$3, create_fragment$4, safe_not_equal, {});
+    		init(this, options, instance$4, create_fragment$5, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "App",
     			options,
-    			id: create_fragment$4.name
+    			id: create_fragment$5.name
     		});
     	}
     }

@@ -5,7 +5,7 @@
   import Header from './Header.svelte';
   const routes = {
     '/': PackageList,
-    '/package/*': Package,
+    '/package/:id': Package,
   }
 </script>
 
@@ -13,7 +13,6 @@
   <Header/>
   <!--	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>-->
   <Router {routes}/>
-<!--  <PackageList/>-->
 </main>
 
 <style>
