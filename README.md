@@ -24,4 +24,4 @@ npm install
 npm run dev
 ```
 
-Now the app should be running on localhost (On the default port -- 5000?)
+The url for the app is printed into the terminal, by default it is  http://localhost:5000. 
