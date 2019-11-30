@@ -8,16 +8,23 @@ App is running on https://reaktor.rauko.la/
 ## Installation
 
 
-Python 3 and Node.js are required for running the development servers locally. Tested on Python 3.7.x and on Node 12.13.1 & 10.15.2. 
+Python 3 (pip) and Node.js (npm) are required for running the development servers locally. Tested on Python 3.7.x, Node 12.13.1 & 10.15.2 and npm 5.8.0 & 6.12.1 
 
-To run the Flask server, navigate to project root, create and activate a venv and install dependencies:
+To run the Flask server, we need to install python dependencies. To install them into a working environment specific to this project, navigate to project root, create and activate a venv:
+```sh
+python3 -m venv venv
+source venv/bin/activate # On linux
+.\venv\Scripts\activate # On windows
+```
+
+Install dependencies and run Flask:
 
 ```sh
 pip install -r requirements.txt
 flask run -p 5001
 ```
 
-Then navigate to /frontend, and run:
+Then open another terminal and navigate to frontend/, and run:
 
 ```sh
 npm install
