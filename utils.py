@@ -1,9 +1,19 @@
 def parse_field_line(prefix, line):
+    """
+    Removes prefix and line change from line
+    :param prefix: is removed
+    :param line: to be parsed
+    :return: line with prefix and \n removed
+    """
     return line.replace(prefix, "").replace("\n", "")
 
 
 def parse_desc_line(line):
-
+    """
+    If empty desc row, add row changes for HTML. Otherwise remove line break.
+    :param line: description row to be parsed
+    :return: parsed line
+    """
     # Empty lines in field values are represented by " ."
     if line.strip() == ".":
         return "<br /><br />"
@@ -12,6 +22,12 @@ def parse_desc_line(line):
 
 
 def parse_depends_line(prefix, line):
+    """
+    Parses dependencies from Depends value.
+    :param prefix: is removed
+    :param line: to be parsed
+    :return: List of individual dependencies with no version number or duplicates.
+    """
     line = parse_field_line(prefix, line)
     depends = []
     # Example line: libc6 (>= 2.14), zlib1g (>= 1:1.1.4), debconf (>= 0.5) | debconf-2.0
@@ -26,6 +42,10 @@ def parse_depends_line(prefix, line):
 
 
 def get_packages():
+    """
+    Reads and parses data from status.real
+    :return: Alphabetically sorted list of individual packages (with name, description, dependencies)
+    """
     package_prefix = "Package: "
     desc_prefix = "Description: "
     depends_prefix = "Depends: "
@@ -33,16 +53,15 @@ def get_packages():
     desc_temp = ""
     package_dict = {}
     dependencies = []
-    idx = 1
+    idx = 0
     pkg_name = ""
 
     # WORK IN PROGRESS VERSION
     with open("status.real", "r", encoding="utf8") as f:
         content = f.readlines()
-        # First we map every package into a dict and assign id
+        # First we create a dictionary of packages with IDs and list of dependencies
         for line in content:
             if line.startswith(package_prefix):
-                # package_name = line.replace(package_prefix, "").replace("\n", "")
                 pkg_name = parse_field_line(package_prefix, line)
                 package_dict[pkg_name] = {
                     "id": idx,
@@ -52,25 +71,25 @@ def get_packages():
                     "depends_this": []
                 }
                 idx += 1
+            # First line of Description row is a short description of the package
             elif line.startswith(desc_prefix):
                 package_dict[pkg_name]["description_short"] = parse_field_line(desc_prefix, line)
                 desc_block = True
                 desc_temp = ""
+            # Rows after the short description contains a longer description, and are prefixed with a space (" ")
             elif desc_block:
-                # field value lines start with a space (" ").
                 if not line.startswith(" "):
                     package_dict[pkg_name]["description"] = desc_temp
                     desc_block = False
                 desc_temp += parse_desc_line(line)
             elif line.startswith(depends_prefix):
-                # depends_dict[package["name"]]
                 pkg_depends = parse_depends_line(depends_prefix, line)
                 dependencies.append({
                     "name": pkg_name,
                     "depends": pkg_depends,
                     "id": package_dict[pkg_name]["id"]
                 })
-        # Map each dependency to and from package (with ID id exists)
+        # With package dictionary we can easily assign IDs to each dependency package. Assign None if package doesn't exist
         for pkg in dependencies:
             pkg_depends = pkg["depends"]
             for pkg_d in pkg_depends:
@@ -80,7 +99,7 @@ def get_packages():
                 except KeyError:
                     id = None
                 package_dict[pkg["name"]]["depends"].append({"id": id, "name": pkg_d})
-    # Convert dict to list
+    # Make a list from package_dict
     packages = []
     for key, value in package_dict.items():
         package = {
@@ -94,13 +113,3 @@ def get_packages():
         packages.append(package)
     packages = sorted(packages, key=lambda p: p["name"])
     return packages
-
-
-def main():
-    """ Main entry point of the app """
-    get_packages()
-
-
-if __name__ == "__main__":
-    """ This is executed when run from the command line """
-    main()

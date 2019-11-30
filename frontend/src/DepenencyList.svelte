@@ -1,27 +1,29 @@
 <script>
-    export let packageList = null;
+  export let packageList = null;
 </script>
 
 {#if packageList != null}
-{#each packageList as pkg}
-    <span class="dependList">
+    {#each packageList as pkg}
+      <span class="dependList">
       {#if pkg.id != null}
-            <a class="dependList" href="#/package/{pkg.id}">{pkg.name}</a>
-        {:else}
-            <span style="color: black; font-weight: 400;">{pkg.name}</span>
-        {/if}
+        <a class="dependList" href="#/package/{pkg.id}">{pkg.name}</a>
+      {:else}
+        <span style="color: black; font-weight: 400;">{pkg.name}</span>
+      {/if}
     </span>
-{/each}
+    {/each}
 {/if}
 
 <style>
   span {
     color: #ff3e00;
   }
-  .dependList::after{
+
+  .dependList::after {
     content: " | ";
   }
-  .dependList:last-child::after{
+
+  .dependList:last-child::after {
     content: "";
   }
 </style>

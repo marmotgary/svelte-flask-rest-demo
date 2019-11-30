@@ -4,4 +4,4 @@ venv/*
 .DS_Store
 node_modules
 public/build
-frontend2/*
+*/package-lock.json

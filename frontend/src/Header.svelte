@@ -11,6 +11,7 @@
     font-weight: 100;
     text-align: center;
   }
+
   h1 a {
     color: unset;
   }
