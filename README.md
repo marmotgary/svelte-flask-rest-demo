@@ -2,7 +2,7 @@
 
 My simple and sweet solution to pre-assignment for junior developer positions. Uses a Flask API and Svelte front end to display the contents of a sample status file (Debian and Ubuntu /var/lib/dpkg/status). This is a first time im using Flask app as an API endpoint, and first time using svelte (which feels really nice btw. Probably using svelte for my next project as well).
 
-App is running on https://reaktor.rauko.la/
+~~App is running on https://reaktor.rauko.la/~~
 
 
 ## Installation
